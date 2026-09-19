@@ -41,6 +41,28 @@ struct BatterySnapshot {
         return Double(full) / Double(designCapacity) * 100
     }
 
+    /// Energy left in the usable window, in watt-hours.
+    var wattHoursLeft: Double {
+        Double(rawCurrent) * voltage / 1_000_000
+    }
+
+    /// How long the machine would run on battery at the power it is drawing
+    /// right now. While discharging that is the pack's own output; while
+    /// plugged in it is SystemLoad, i.e. what would be drawn if unplugged.
+    var estimatedMinutesLeft: Int? {
+        guard let load = machineWatts, load > 0.5, wattHoursLeft > 0 else { return nil }
+        return Int(wattHoursLeft / load * 60)
+    }
+
+    /// Power the machine itself is consuming, charging excluded. On battery
+    /// that is the pack's output; plugged in it is SystemLoad, which also
+    /// carries whatever is going into the battery, so that part is subtracted.
+    var machineWatts: Double? {
+        guard isPluggedIn else { return watts > 0 ? watts : nil }
+        guard let load = systemLoad else { return nil }
+        return max(load / 1000 - (isCharging ? watts : 0), 0)
+    }
+
     /// Charge added per hour, as a share of full capacity (e.g. "+62 %/h").
     var percentPerHour: Double? {
         guard rawMax > 0, amperage != 0 else { return nil }

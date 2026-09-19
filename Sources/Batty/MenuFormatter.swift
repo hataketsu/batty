@@ -16,6 +16,11 @@ enum MenuFormatter {
 
         if let eta = etaLine(s) { menu.addItem(row("Còn lại", eta)) }
 
+        if let minutes = s.estimatedMinutesLeft {
+            let label = s.isPluggedIn ? "Rút ra trụ được" : "Ước tính"
+            menu.addItem(row(label, "\(duration(minutes)) ở mức tiêu thụ hiện tại"))
+        }
+
         if s.watts >= 0.1 {
             menu.addItem(row("Công suất", String(
                 format: "%.2f W  (%.0f mA @ %.2f V)",
@@ -34,9 +39,12 @@ enum MenuFormatter {
             menu.addItem(row("Sạc", detail))
         }
 
-        if let wall = s.systemPowerIn, let load = s.systemLoad {
-            menu.addItem(row("Nguồn vào", String(
-                format: "%.1f W  ·  máy dùng %.1f W", wall / 1000, load / 1000)))
+        if let wall = s.systemPowerIn {
+            var detail = String(format: "%.1f W", wall / 1000)
+            if let machine = s.machineWatts {
+                detail += String(format: "  ·  máy dùng %.1f W", machine)
+            }
+            menu.addItem(row("Nguồn vào", detail))
         }
 
         menu.addItem(.separator())
