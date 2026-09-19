@@ -6,6 +6,8 @@ and temperature.
 
 ![menu bar](docs/menubar.png)
 
+![menu](docs/menu.png)
+
 ## Why
 
 macOS tells you a percentage and an estimate. Batty reads the raw

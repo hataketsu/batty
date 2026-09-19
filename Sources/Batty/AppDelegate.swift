@@ -15,6 +15,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.button?.font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .regular)
         menu.delegate = self
+        // Rows carry no action, and AppKit greys out actionless items unless we
+        // take over enabling ourselves.
+        menu.autoenablesItems = false
         statusItem.menu = menu
         refresh()
         schedule(every: idleInterval)

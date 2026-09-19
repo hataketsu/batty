@@ -11,6 +11,7 @@ enum MenuFormatter {
     static func populate(_ menu: NSMenu, with s: BatterySnapshot,
                          target: AnyObject, quitAction: Selector) {
         menu.removeAllItems()
+        menu.autoenablesItems = false
 
         menu.addItem(header(state(s)))
 
@@ -89,7 +90,6 @@ enum MenuFormatter {
         item.attributedTitle = NSAttributedString(string: text, attributes: [
             .font: NSFont.systemFont(ofSize: 13, weight: .semibold)
         ])
-        item.isEnabled = false
         return item
     }
 
@@ -106,7 +106,6 @@ enum MenuFormatter {
             .foregroundColor: NSColor.labelColor
         ]))
         item.attributedTitle = text
-        item.isEnabled = false
         return item
     }
 }
