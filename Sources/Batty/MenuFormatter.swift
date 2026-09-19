@@ -41,9 +41,12 @@ enum MenuFormatter {
 
         menu.addItem(.separator())
 
-        menu.addItem(row("Dung lượng", "\(s.rawCurrent) / \(s.rawMax) mAh"))
+        menu.addItem(row("Dung lượng", "\(s.rawCurrent) / \(s.rawMax) mAh dùng được"))
+        if s.nominalCapacity > 0 {
+            menu.addItem(row("Pin thật", "\(s.nominalCapacity) mAh  ·  dự trữ \(s.packReserve) mAh"))
+        }
         if let health = s.health {
-            menu.addItem(row("Chai pin", String(
+            menu.addItem(row("Sức khỏe", String(
                 format: "%.1f%%  (thiết kế %d mAh)", health, s.designCapacity)))
         }
         menu.addItem(row("Chu kỳ sạc", "\(s.cycleCount)"))

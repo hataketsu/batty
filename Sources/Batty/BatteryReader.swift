@@ -14,7 +14,9 @@ struct BatterySnapshot {
     var watts: Double         // |amperage| * voltage / 1e6
 
     var rawCurrent: Int       // AppleRawCurrentCapacity, mAh
-    var rawMax: Int           // AppleRawMaxCapacity, mAh
+    var rawMax: Int           // AppleRawMaxCapacity, mAh — usable, reserve excluded
+    var nominalCapacity: Int  // NominalChargeCapacity, mAh — what the pack holds
+    var packReserve: Int      // mAh held back from the usable window
     var designCapacity: Int   // mAh
     var cycleCount: Int
     var temperature: Double   // celsius
@@ -29,10 +31,14 @@ struct BatterySnapshot {
     var systemPowerIn: Double?   // mW drawn from the wall right now
     var systemLoad: Double?      // mW consumed by the machine
 
-    /// State of health: usable capacity vs. the capacity it shipped with.
+    /// State of health. This compares NominalChargeCapacity — the charge the
+    /// pack actually holds — against the design capacity. AppleRawMaxCapacity
+    /// is the *usable* window, which excludes PackReserve, so using it would
+    /// report a few percent of wear that does not exist.
     var health: Double? {
-        guard designCapacity > 0, rawMax > 0 else { return nil }
-        return Double(rawMax) / Double(designCapacity) * 100
+        let full = nominalCapacity > 0 ? nominalCapacity : rawMax
+        guard designCapacity > 0, full > 0 else { return nil }
+        return Double(full) / Double(designCapacity) * 100
     }
 
     /// Charge added per hour, as a share of full capacity (e.g. "+62 %/h").
@@ -87,6 +93,8 @@ enum BatteryReader {
             watts: abs(amperage) * voltage / 1_000_000,
             rawCurrent: int("AppleRawCurrentCapacity") ?? 0,
             rawMax: int("AppleRawMaxCapacity") ?? 0,
+            nominalCapacity: int("NominalChargeCapacity") ?? 0,
+            packReserve: int("PackReserve") ?? 0,
             designCapacity: int("DesignCapacity") ?? 0,
             cycleCount: int("CycleCount") ?? 0,
             temperature: Double(int("Temperature") ?? 0) / 100,
