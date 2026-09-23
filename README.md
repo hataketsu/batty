@@ -21,7 +21,12 @@ original capacity is left.
 git clone https://github.com/hataketsu/batty.git
 cd batty
 ./build.sh
-cp -r build/Batty.app /Applications/
+```
+
+`build.sh` leaves `Batty.app` in the repo root — drag it into `/Applications`, or:
+
+```bash
+cp -R Batty.app /Applications/
 open /Applications/Batty.app
 ```
 

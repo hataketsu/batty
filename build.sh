@@ -3,7 +3,8 @@
 set -euo pipefail
 
 cd "$(dirname "$0")"
-APP="build/Batty.app"
+# The finished bundle lands in the repo root, ready to drag into /Applications.
+APP="Batty.app"
 
 swift build -c release
 
@@ -13,6 +14,9 @@ build/icongen build/Batty.iconset >/dev/null
 iconutil -c icns build/Batty.iconset -o build/AppIcon.icns
 
 echo "Assembling $APP..."
+# Replacing the bundle under a running copy leaves it alive but detached from
+# the menu bar, so stop it first.
+pkill -f "$(pwd)/$APP/Contents/MacOS/Batty" 2>/dev/null || true
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp .build/release/Batty "$APP/Contents/MacOS/Batty"
@@ -41,4 +45,5 @@ PLIST
 # Ad-hoc signature so macOS is happy launching it locally.
 codesign --force --deep --sign - "$APP" >/dev/null 2>&1 || true
 
-echo "Done: $APP"
+echo "Done: $(pwd)/$APP"
+echo "Cài: kéo Batty.app vào /Applications, hoặc chạy: cp -R $APP /Applications/"
